@@ -12,10 +12,18 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/food', require('./routes/food'));
 
-// MongoDB & Server
-const mongoUri = process.env.MONGODB_URI;
+// MongoDB connection
+mongoose.set('strictQuery', false); // optional, to handle Mongoose deprecation warning
+
+const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/foodbridge';
 
 mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => app.listen(process.env.PORT || 5001, () =>
-      console.log(`API running on port ${process.env.PORT || 5001}`)))
-  .catch(err => console.log('MongoDB connection error', err));
+  .then(() => {
+    const port = process.env.PORT || 5001;
+    app.listen(port, () => {
+      console.log(`API running on port ${port}`);
+    });
+  })
+  .catch(err => {
+    console.log('MongoDB connection error', err);
+  });
